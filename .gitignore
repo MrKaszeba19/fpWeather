@@ -1,0 +1,6 @@
+fpweather
+*.o
+*.ppu
+*.rsj
+trash/
+*.exe
