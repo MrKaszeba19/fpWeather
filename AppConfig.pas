@@ -6,16 +6,73 @@ interface
 
 uses SysUtils;
 
-procedure doConfig(var tok : String; var loc : String);
+procedure raiserror(Const msg : string);  
+procedure setConfig(var tok : String; var loc : String);
+procedure getConfig(var tok : String; var loc : String);
 function configExists() : Boolean;
 
 implementation
+
+procedure raiserror(Const msg : string);  
+begin  
+  raise exception.create(Msg) at  
+  get_caller_addr(get_frame),  
+  get_caller_frame(get_frame);  
+end; 
+
+// https://stackoverflow.com/questions/65016942/freepascal-how-can-i-copy-a-file-from-one-location-and-paste-it-in-another
+function CopyFile(const SrcFileName, DstFileName: AnsiString): Boolean;
+var
+    Src, Dst: File;
+    Buf: array of Byte;
+    ReadBytes: Int64;
+begin
+    Assign(Src, SrcFileName);
+    {$PUSH}{$I-}
+    Reset(Src, 1);
+    {$POP}
+    if IOResult <> 0 then
+        Exit(False);
+
+    Assign(Dst, DstFileName);
+    {$PUSH}{$I-}
+    Rewrite(Dst, 1);
+    {$POP}
+    if IOResult <> 0 then begin
+        Close(Src);
+        Exit(False);
+    end;
+
+    SetLength(Buf, 64 * 1024 * 1024);
+    while not Eof(Src) do begin
+        {$PUSH}{$I-}
+        BlockRead(Src, Buf[0], Length(Buf), ReadBytes);
+        {$POP}
+        if IOResult <> 0 then begin
+            Close(Src);
+            Close(Dst);
+            Exit(False);
+        end;
+        {$PUSH}{$I-}
+        BlockWrite(Dst, Buf[0], ReadBytes);
+        {$POP}
+        if IOResult <> 0 then begin
+            Close(Src);
+            Close(Dst);
+            Exit(False);
+        end;
+    end;
+    Close(Src);
+    Close(Dst);
+    Exit(True);
+end;
 
 procedure setUp(tok : String; loc : String);
 var
     dir   : String;
     isdir : Boolean;
     fl    : Text;
+    ok    : Boolean;
 begin
     isdir := false;
     dir := GetAppConfigDir(false)+'/';
@@ -33,6 +90,7 @@ begin
     end;
     if (isDir) then
     begin
+        ok := CopyFile(dir+'cfg', dir+'cfg.bak');
         assignfile(fl, dir+'cfg');
         rewrite(fl);
         writeln(fl, tok);
@@ -41,7 +99,7 @@ begin
     end;
 end;
 
-procedure doConfig(var tok : String; var loc : String);
+procedure setConfig(var tok : String; var loc : String);
 begin
     writeln('fpWeather Config');
     write('Type your OpenWeatherApp API token: ');
@@ -54,6 +112,31 @@ end;
 function configExists() : Boolean;
 begin
     Result := FileExists(GetAppConfigDir(false)+'/cfg');
+end;
+
+procedure getConfig(var tok : String; var loc : String);
+var
+    dir : String;
+    fl  : Text;
+begin
+    if (configExists) then
+    begin
+        dir := GetAppConfigDir(false)+'/';
+        try
+            assignfile(fl, dir+'cfg');
+            reset(fl);
+            readln(fl, tok);
+            readln(fl, loc);
+            closefile(fl);  
+        except
+            on E: Exception do
+            begin
+                raiserror('Config file is corrupted!');  
+            end;
+        end;
+    end else begin
+        raiserror('Config file not found!');
+    end;
 end;
 
 end.

@@ -13,7 +13,7 @@ uses SysUtils, Classes,
     {$IFDEF MSWINDOWS}
     Process,
     {$ENDIF}
-    CustApp, AppConfig;
+    CustApp, AppConfig, WeatherEngine;
 
 
 
@@ -40,7 +40,7 @@ begin
     end;
 
     if HasOption('c', 'config') then begin
-        DoConfig(Token, City);
+        SetConfig(Token, City);
         Halt();
     end;
     
@@ -49,7 +49,18 @@ begin
     if not (ConfigExists()) then
     begin
         writeln('Note: No config file found. Creating new one.');
-        DoConfig(Token, City);
+        SetConfig(Token, City);
+    end;
+
+    GetConfig(Token, City);
+
+    try
+        writeln(GetRequest('http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+''));
+    except
+        on E: Exception do
+        begin
+            writeln(E.toString());
+        end;
     end;
 
 
