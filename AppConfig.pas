@@ -7,9 +7,10 @@ interface
 uses SysUtils;
 
 procedure raiserror(Const msg : string);  
-procedure setConfig(var tok : String; var loc : String);
-procedure getConfig(var tok : String; var loc : String);
+procedure setConfig(var tok : String; var loc : String; var units : String);
+procedure getConfig(var tok : String; var loc : String; var units : String);
 function configExists() : Boolean;
+function getUnits(x : Integer) : String;
 
 implementation
 
@@ -67,7 +68,7 @@ begin
     Exit(True);
 end;
 
-procedure setUp(tok : String; loc : String);
+procedure setUp(tok : String; loc : String; var units : String);
 var
     dir   : String;
     isdir : Boolean;
@@ -95,18 +96,41 @@ begin
         rewrite(fl);
         writeln(fl, tok);
         writeln(fl, loc);
+        writeln(fl, units);
         closefile(fl);
     end;
 end;
 
-procedure setConfig(var tok : String; var loc : String);
+function getUnits(x : Integer) : String;
+begin
+    case x of
+        0 : Result := 'standard';
+        1 : Result := 'metric';
+        2 : Result := 'imperial';
+        else Result := 'standard';
+    end;
+end;
+
+procedure setConfig(var tok : String; var loc : String; var units : String);
+var
+    guess : Integer;
 begin
     writeln('fpWeather Config');
     write('Type your OpenWeatherApp API token: ');
     readln(tok);
     write('Type your city (in English):        ');
     readln(loc);
-    setUp(tok, loc);
+    repeat
+        writeln('Preferable units:                 ');
+        writeln('    0 - Standard (Kelvin, m/s)');
+        //writeln('    1 - Metric (Celsius, km/h)');
+        writeln('    1 - Metric (Celsius, m/s)');
+        writeln('    2 - Imperial (Fahrenheit, mph)');
+        write('Your choice: ');
+        readln(guess);
+    until guess in [0, 1, 2];
+    Units := getUnits(guess);
+    setUp(tok, loc, units);
 end;
 
 function configExists() : Boolean;
@@ -114,7 +138,7 @@ begin
     Result := FileExists(GetAppConfigDir(false)+'/cfg');
 end;
 
-procedure getConfig(var tok : String; var loc : String);
+procedure getConfig(var tok : String; var loc : String; var units : String);
 var
     dir : String;
     fl  : Text;
@@ -127,6 +151,7 @@ begin
             reset(fl);
             readln(fl, tok);
             readln(fl, loc);
+            readln(fl, units);
             closefile(fl);  
         except
             on E: Exception do

@@ -21,7 +21,8 @@ type
     MyApp = class(TCustomApplication)
     private
         Token : String;
-        City  : String;       
+        City  : String;    
+        Units : String;   
     protected
         procedure DoRun; override;
     public
@@ -40,22 +41,41 @@ begin
     end;
 
     if HasOption('c', 'config') then begin
-        SetConfig(Token, City);
+        SetConfig(Token, City, Units);
         Halt();
     end;
+
     
     // code
 
     if not (ConfigExists()) then
     begin
-        writeln('Note: No config file found. Creating new one.');
-        SetConfig(Token, City);
+        writeln('Note: No config file found. I''m creating new one.');
+        SetConfig(Token, City, Units);
     end;
 
-    GetConfig(Token, City);
+    GetConfig(Token, City, Units);
+
+    if HasOption('u', 'units') then begin
+        try
+            if StrToInt(getOptionValue('u', 'units')) in [0, 1, 2] then
+            begin
+                Units := getUnits(StrToInt(getOptionValue('u', 'units')));
+            end else begin
+                writeln('Note: wrong unit flag value. I''m not changing the units then.');
+            end;
+        except
+            on E: Exception do
+            begin
+                writeln('Note: wrong unit flag value. I''m not changing the units then.');
+                writeln(E.toString());
+            end;
+        end;
+    end;
 
     try
-        writeln(GetRequest('http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+''));
+        //writeln(GetRequest('http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+Units+''));
+        writeln(printJSON('http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+Units+''));
     except
         on E: Exception do
         begin
@@ -81,6 +101,12 @@ end;
 procedure MyApp.WriteHelp;
 begin
     writeln('Usage: '+Title+' ''COMMAND'' flags');
+    writeln('Available flags: ');
+    writeln('  -c,   --config  : Set up the config file');
+    writeln('  -h,   --help    : Display help');
+    writeln('  -u 0, --units=0 : Display weather in Kelvins and m/s');
+    writeln('     1,        =1 : Display weather in Celsius and km/h');
+    writeln('     2,        =2 : Display weather in Fahrenheit and mph');
 end;
 
 var App : MyApp;

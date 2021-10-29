@@ -7,6 +7,8 @@ interface
 uses fpHTTPClient, fpJSON, JSONParser;
 
 function getRequest(addr : String) : String;
+function printJSON(str : String) : String;
+function printFormattedJSON(str : String) : String;
 
 implementation
 
@@ -19,6 +21,16 @@ begin
         finally
             Free;
         end;
+end;
+
+function printFormattedJSON(str : String) : String;
+begin
+    Result := GetJSON(getRequest(str)).FormatJSON;
+end;
+
+function printJSON(str : String) : String;
+begin
+    Result := getRequest(str);
 end;
 
 end.
