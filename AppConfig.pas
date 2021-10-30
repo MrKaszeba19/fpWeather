@@ -6,9 +6,15 @@ interface
 
 uses SysUtils;
 
+{$IFDEF WINDOWS}
+const CATSLASH = '\';
+{$ELSE}
+const CATSLASH = '/';
+{$ENDIF}
+
 procedure raiserror(Const msg : string);  
-procedure setConfig(var tok : String; var loc : String; var units : String);
-procedure getConfig(var tok : String; var loc : String; var units : String);
+procedure setConfig(var tok : String; var loc : String; var units : Integer);
+procedure getConfig(var tok : String; var loc : String; var units : Integer);
 function configExists() : Boolean;
 function getUnits(x : Integer) : String;
 
@@ -68,7 +74,7 @@ begin
     Exit(True);
 end;
 
-procedure setUp(tok : String; loc : String; var units : String);
+procedure setUp(tok : String; loc : String; var units : Integer);
 var
     dir   : String;
     isdir : Boolean;
@@ -76,12 +82,12 @@ var
     ok    : Boolean;
 begin
     isdir := false;
-    dir := GetAppConfigDir(false)+'/';
+    dir := GetAppConfigDir(false)+CATSLASH;
     if not DirectoryExists(dir) then
     begin
         if not CreateDir(dir) then
         begin
-            writeln('Failed to set up a directory for the config file.');
+            raiserror('Error: Failed to set up a directory for the config file.');
             isDir := false;  
         end else begin
             isDir := true;
@@ -107,11 +113,12 @@ begin
         0 : Result := 'standard';
         1 : Result := 'metric';
         2 : Result := 'imperial';
+        3 : Result := 'imperial';
         else Result := 'standard';
     end;
 end;
 
-procedure setConfig(var tok : String; var loc : String; var units : String);
+procedure setConfig(var tok : String; var loc : String; var units : Integer);
 var
     guess : Integer;
 begin
@@ -121,31 +128,32 @@ begin
     write('Type your city (in English):        ');
     readln(loc);
     repeat
-        writeln('Preferable units:                 ');
-        writeln('    0 - Standard (Kelvin, m/s)');
+        writeln('Preferable locale:                 ');
+        writeln('    0 - SI (Kelvin, m/s, YMD)');
         //writeln('    1 - Metric (Celsius, km/h)');
-        writeln('    1 - Metric (Celsius, m/s)');
-        writeln('    2 - Imperial (Fahrenheit, mph)');
+        writeln('    1 - Metric (Celsius, m/s, DMY)');
+        writeln('    2 - US Imperial (Fahrenheit, mph, MDY)');
+        writeln('    3 - UK Imperial (Celsius, mph, DMY)');
         write('Your choice: ');
         readln(guess);
-    until guess in [0, 1, 2];
-    Units := getUnits(guess);
+    until guess in [0, 1, 2, 3];
+    Units := guess;
     setUp(tok, loc, units);
 end;
 
 function configExists() : Boolean;
 begin
-    Result := FileExists(GetAppConfigDir(false)+'/cfg');
+    Result := FileExists(GetAppConfigDir(false)+CATSLASH+'cfg');
 end;
 
-procedure getConfig(var tok : String; var loc : String; var units : String);
+procedure getConfig(var tok : String; var loc : String; var units : Integer);
 var
     dir : String;
     fl  : Text;
 begin
     if (configExists) then
     begin
-        dir := GetAppConfigDir(false)+'/';
+        dir := GetAppConfigDir(false)+CATSLASH;
         try
             assignfile(fl, dir+'cfg');
             reset(fl);
@@ -156,11 +164,11 @@ begin
         except
             on E: Exception do
             begin
-                raiserror('Config file is corrupted!');  
+                raiserror('Error: Config file is corrupted.');  
             end;
         end;
     end else begin
-        raiserror('Config file not found!');
+        raiserror('Error: Config file not found.');
     end;
 end;
 

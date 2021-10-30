@@ -7,8 +7,9 @@ interface
 uses fpHTTPClient, fpJSON, JSONParser;
 
 function getRequest(addr : String) : String;
-function printJSON(str : String) : String;
 function printFormattedJSON(str : String) : String;
+function printJSON(str : String) : String;
+function printInfo(str : String) : String;
 
 implementation
 
@@ -31,6 +32,11 @@ end;
 function printJSON(str : String) : String;
 begin
     Result := getRequest(str);
+end;
+
+function printInfo(str : String) : String;
+begin
+    Result := 'A more beautified look of the weather info is coming soon! ^_^';
 end;
 
 end.

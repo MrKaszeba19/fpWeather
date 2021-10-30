@@ -16,11 +16,20 @@ Author: Paul Lipkowski
   
 ## Usage
 
-- `fpweather` – shows weather of your city using your OpenWeatherMap API
+- `fpweather` – shows weather of your city using your OpenWeatherMap API token in a compact readable format (*to be implemented*, please use `-j` flag)
 - `fpweather [flags]`
-    * `-c` or `--config` : Launch config
-    * `-h` or `--help` : Display help
-    * `-u N` or `--units=N` : Change output units (`N=0` is **Kelvin and m/s**, `N=1` is **Celsius and m/s** (to be replaced with km/h), and `N=2` is **Fahrenheit and mph**)  
+    * `-c` or `--config` – Launch config
+    * `-h` or `--help` – Display help
+    * `-j` or `--json` – Print a raw JSON from OpenWeatherMap
+    * `-J` or `--JSON` – Print a more beautified JSON (*to be implemented*; so far it works like `-j`)
+    * `-n` or `--no-feed-line` – Don't feed line after the execution of a program 
+    * `-u N` or `--units=N` – Change output units (`N = [0, 1, 2, 3]`, see the list of values below)
+
+Available units (`N` values):
+- `N = 0` – :united_nations: International SI units (Kelvin and m/s)
+- `N = 1` – :eu: Metric units (Celsius and m/s) – to be replaced with Celsius and km/h
+- `N = 2` – :us: US Imperial units (Fahrenheit and mph) 
+- `N = 3` – :uk: UK Imperial units (Celsius and mph) – so far it works like `N=2`
 
 ## More info
 
