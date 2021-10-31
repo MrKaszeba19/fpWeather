@@ -102,8 +102,12 @@ begin
     // print weather info
     try
         URL := 'http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+getUnits(Units)+'';
-        if (toJSON > 0) then
+        if (toJSON >= 2) then
         begin
+            write(printFormattedJSON(URL));
+            if FeedLine then writeln();
+        end else if (toJSON = 1) then 
+        begin 
             write(printJSON(URL));
             if FeedLine then writeln();
         end else begin

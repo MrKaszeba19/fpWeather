@@ -16,13 +16,13 @@ Author: Paul Lipkowski
   
 ## Usage
 
-- `fpweather` – shows weather of your city using your OpenWeatherMap API token in a compact readable format (*to be implemented*, please use `-j` flag)
+- `fpweather` – shows weather of your city using your OpenWeatherMap API token in a compact readable format 
 - `fpweather [flags]`
     * `-c` or `--config` – Launch config
     * `-h` or `--help` – Display help
     * `-j` or `--json` – Print a raw JSON from OpenWeatherMap
-    * `-J` or `--JSON` – Print a more beautified JSON (*to be implemented*; so far it works like `-j`)
-    * `-n` or `--no-feed-line` – Don't feed line after the execution of a program 
+    * `-J` or `--JSON` – Print a beautified JSON (*to be improved*)
+    * `-n` or `--no-feed-line` – Don't feed the line after the execution of the program 
     * `-u N` or `--units=N` – Change output units (`N = [0, 1, 2, 3]`, see the list of values below)
 
 Available units (`N` values):
