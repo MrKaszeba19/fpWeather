@@ -22,7 +22,8 @@ type
     private
         Token    : String;
         City     : String;    
-        Units    : Integer;   
+        Units    : Integer; 
+        Locale   : Locale;  
         ToJSON   : Integer;
         FeedLine : Boolean;
         URL      : String;
@@ -99,9 +100,11 @@ begin
         end;
     end;
 
+    Locale := GetLocale(Units);
+
     // print weather info
     try
-        URL := 'http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+getUnits(Units)+'';
+        URL := 'http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+Locale.Param+'';
         if (toJSON >= 2) then
         begin
             write(printFormattedJSON(URL));
@@ -111,7 +114,7 @@ begin
             write(printJSON(URL));
             if FeedLine then writeln();
         end else begin
-            write(printInfo(URL));
+            write(printInfo(URL, Locale));
             if FeedLine then writeln();
         end;
     except

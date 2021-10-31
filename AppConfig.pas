@@ -12,11 +12,23 @@ const CATSLASH = '\';
 const CATSLASH = '/';
 {$ENDIF}
 
+
+type Locale = record
+    Name         : String;
+    Param        : String;
+    DegreesUnit  : String;
+    PressureUnit : String;
+    PressureCoef : Extended; 
+    SpeedUnit    : String;
+    SpeedCoef    : Extended;
+end;
+
 procedure raiserror(Const msg : string);  
 procedure setConfig(var tok : String; var loc : String; var units : Integer);
 procedure getConfig(var tok : String; var loc : String; var units : Integer);
 function configExists() : Boolean;
 function getUnits(x : Integer) : String;
+function getLocale(x : Integer) : Locale;
 
 implementation
 
@@ -74,6 +86,55 @@ begin
     Exit(True);
 end;
 
+// locales
+
+function LocaleSI() : Locale;
+begin
+    Result.Name         := 'SI International';
+    Result.Param        := 'standard';
+    Result.DegreesUnit  := ' K';
+    Result.PressureUnit := ' hPa';
+    Result.PressureCoef := 1.0; 
+    Result.SpeedUnit    := ' m/s';
+    Result.SpeedCoef    := 1.0;
+end;
+
+function LocaleEU() : Locale;
+begin
+    Result.Name         := 'EU Metric';
+    Result.Param        := 'metric';
+    Result.DegreesUnit  := '°C';
+    Result.PressureUnit := ' hPa';
+    Result.PressureCoef := 1.0; 
+    Result.SpeedUnit    := ' km/h';
+    Result.SpeedCoef    := 3.6;
+end;
+
+function LocaleUS() : Locale;
+begin
+    Result.Name         := 'US Imperial';
+    Result.Param        := 'imperial';
+    Result.DegreesUnit  := '°F';
+    Result.PressureUnit := ' psi';
+    Result.PressureCoef := 68.9475728; 
+    Result.SpeedUnit    := ' mph';
+    Result.SpeedCoef    := 1.0;
+end;
+
+function LocaleUK() : Locale;
+begin
+    Result.Name         := 'UK Imperial';
+    Result.Param        := 'metric';
+    Result.DegreesUnit  := '°C';
+    Result.PressureUnit := ' mb';
+    Result.PressureCoef := 1.0; 
+    Result.SpeedUnit    := ' mph';
+    Result.SpeedCoef    := 2.23693629;
+end;
+
+
+//
+
 procedure setUp(tok : String; loc : String; var units : Integer);
 var
     dir   : String;
@@ -113,8 +174,19 @@ begin
         0 : Result := 'standard';
         1 : Result := 'metric';
         2 : Result := 'imperial';
-        3 : Result := 'imperial';
+        3 : Result := 'metric';
         else Result := 'standard';
+    end;
+end;
+
+function getLocale(x : Integer) : Locale;
+begin
+    case x of
+        0 : Result := LocaleSI();
+        1 : Result := LocaleEU();
+        2 : Result := LocaleUS();
+        3 : Result := LocaleUK();
+        else Result := LocaleSI();
     end;
 end;
 

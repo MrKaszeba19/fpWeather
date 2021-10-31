@@ -4,13 +4,15 @@ unit WeatherEngine;
 
 interface
 
-uses fpHTTPClient, fpJSON, JSONParser;
+uses 
+    fpHTTPClient, fpJSON, JSONParser,
+    AppConfig;
 
 function getRequest(addr : String) : String;
 function printFormattedJSON(str : String) : String;
 function printJSON(str : String) : String;
 function printRaw(str : String) : String;
-function printInfo(str : String) : String;
+function printInfo(str : String; loc : Locale) : String;
 
 implementation
 
@@ -43,7 +45,7 @@ begin
     Result := getRequest(str);
 end;
 
-function printInfo(str : String) : String;
+function printInfo(str : String; loc : Locale) : String;
 var
     jData : TJSONData;
     //jObject : TJSONObject;
@@ -52,21 +54,21 @@ var
     degrees  : Extended;
     pressure : Integer;
     humidity : Integer;
+    windspeed : Extended;
 begin
-    //jObject := TJSONObject(GetJSON(getRequest(str)));
-    //location := jObject.Get('name');
-    //desc := jObject.Get('weather[0]').Get('description');
+    //Result := 'A more beautified look of the weather info is coming soon! ^_^';
     jData := GetJSON(getRequest(str));
     location := jData.GetPath('name').AsString;
     desc := jData.GetPath('weather[0]').GetPath('description').AsString;
     degrees := jData.GetPath('main').GetPath('temp').AsFloat;
     pressure := jData.GetPath('main').GetPath('pressure').AsInteger;
     humidity := jData.GetPath('main').GetPath('humidity').AsInteger;
-    //Result := 'A more beautified look of the weather info is coming soon! ^_^';
+    windspeed := jData.GetPath('wind').GetPath('speed').AsFloat;
     Result := 'Now in '+location+': '+desc+', '
-        +FloatToStr(degrees)+' degrees, '
-        +IntToStr(pressure)+' mb, '
-        +IntToStr(humidity)+'% humid.';
+        +FloatToStr(degrees)+loc.DegreesUnit+', '
+        +Format('%.2f', [(pressure)/loc.PressureCoef])+loc.PressureUnit+', '
+        +'humidity '+IntToStr(humidity)+'%, '
+        +'wind speed '+Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit+'.';
 end;
 
 end.

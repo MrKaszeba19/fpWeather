@@ -26,10 +26,10 @@ Author: Paul Lipkowski
     * `-u N` or `--units=N` – Change output units (`N = [0, 1, 2, 3]`, see the list of values below)
 
 Available units (`N` values):
-- `N = 0` – :united_nations: International SI units (Kelvin and m/s)
-- `N = 1` – :eu: Metric units (Celsius and m/s) – to be replaced with Celsius and km/h
-- `N = 2` – :us: US Imperial units (Fahrenheit and mph) 
-- `N = 3` – :uk: UK Imperial units (Celsius and mph) – so far it works like `N=2`
+- `N = 0` – :united_nations: International SI units (Kelvin, m/s and hPa)
+- `N = 1` – :eu: Metric units (Celsius, km/h and hPa; m/s on JSON output)
+- `N = 2` – :us: US Imperial units (Fahrenheit, mph and psi; hPa on JSON output) 
+- `N = 3` – :uk: UK Imperial units (Celsius, mph and mb) – so far it works like `N=1` on JSON output
 
 ## More info
 
