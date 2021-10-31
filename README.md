@@ -10,6 +10,7 @@ Author: Paul Lipkowski
     * FreePascal Compiler `fpc` (version 3.0.4 or newer)
     * an OpenWeather API token (get it [here](https://openweathermap.org/appid) if you don't have one)
 - If using Linux, then just compile by executing `compile.sh`
+    * Then you can install fpweather to `$PATH` using `installBash.sh`
 - If using Windows, then compile by executing `compile.bat`
     * The default version of FPC is 3.0.4. If you use the another version of it, then edit the `compile.bat` script and change the setting containing version of FPC (variable `ver`) in order to match your FPC version.
 - After compilation you can run `fpweather` to set up the app config file (if it does not exist) 
