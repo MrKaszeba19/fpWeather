@@ -92,7 +92,7 @@ begin
     humidity := jData.GetPath('main').GetPath('humidity').AsInteger;
     windspeed := jData.GetPath('wind').GetPath('speed').AsFloat;
     windangle := jData.GetPath('wind').GetPath('deg').AsInteger;
-    Result := 'Now in '+location+': '+desc+', '
+    Result := 'Now in '+location+': '+#13#10+desc+', '
         +FloatToStr(degrees)+loc.DegreesUnit+', '
         +Format('%.2f', [(pressure)/loc.PressureCoef])+loc.PressureUnit+', '
         +IntToStr(humidity)+'% humid, '
