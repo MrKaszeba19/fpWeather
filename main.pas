@@ -86,7 +86,6 @@ begin
     end;
 
     // change config to suit flags
-    Display := DefaultDisplay();
     if HasOption('u', 'units') then begin
         try
             if StrToInt(getOptionValue('u', 'units')) in [0, 1, 2, 3] then
@@ -118,6 +117,20 @@ begin
                 writeln(E.toString());
             end;
         end;
+    end;
+    if HasOption('o', 'output') then begin
+        try
+            //pom := getOptionValue('o', 'output');
+            Display := adjustDisplay(getOptionValue('o', 'output'));
+        except
+            on E: Exception do
+            begin
+                writeln('Note: wrong token name. I''m not changing the token then.');
+                writeln(E.toString());
+            end;
+        end;
+    end else begin
+        Display := DefaultDisplay();
     end;
     if HasOption('s', 'style') then begin
         try
@@ -208,6 +221,8 @@ begin
     writeln('  -l S, --location=S   : Show weather in a specified city');
     writeln('  -n  , --no-feed-line : Do not feed line after program execution');
     writeln('        --raw-json     : Get a raw JSON from OpenWeatherMap (in standard units)');
+    writeln('  -o S, --output=S     : Determine which data entries may be displayed using S');
+    writeln('                         (If S="full", then display all data)');
     writeln('  -s 0, --style=0      : Flat output');
     writeln('     1,        =1      : Flat output with location in separate line (default)');
     writeln('     2,        =2      : Output as a list of values with flat subvalues');
@@ -219,6 +234,8 @@ begin
     writeln('     3,        =3      : Use UK Imperial units:      Celsius, mph, mb, mi');
     //writeln('     4,        =4      : Use EU Aviation units:      Celsius, kts, hPa, nm');
     //writeln('     5,        =5      : Use US Aviation units:      Fahrenheit, kts, psi, nm');
+    writeln();
+    writeln('See more at https://github.com/RooiGevaar19/fpWeather');
 end;
 
 var App : MyApp;

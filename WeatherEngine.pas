@@ -117,7 +117,23 @@ begin
         s := s + dsp.OptBullet;
         if (dsp.SepSetting > 1) then s := s + 'temp     ';
         s := s + FloatToStr(degrees)+loc.DegreesUnit
-               + ', ' + dsp.OptSep;
+               + ', ';
+        if (dsp.IsTempMax) then
+        begin
+            s := s + dsp.SubSep + dsp.SubBullet;
+            if (dsp.SepSetting = 3) then s := s + 'min    ';
+            if (dsp.SepSetting = 2) then s := s + 'min ';
+            degrees := jData.GetPath('main').GetPath('temp_min').AsFloat;
+            s := s + FloatToStr(degrees)+loc.DegreesUnit
+               + ', ' + dsp.SubSep;
+            s := s + dsp.SubBullet;
+            if (dsp.SepSetting = 3) then s := s + 'max    ';
+            if (dsp.SepSetting = 2) then s := s + 'max ';
+            degrees := jData.GetPath('main').GetPath('temp_max').AsFloat;
+            s := s + FloatToStr(degrees)+loc.DegreesUnit
+               + ', ';
+        end;
+        s := s + dsp.OptSep;
     end;
     if (dsp.IsPressure) then
     begin
@@ -141,8 +157,10 @@ begin
         windangle := jData.GetPath('wind').GetPath('deg').AsInteger;
         s := s + dsp.OptBullet;
         if (dsp.SepSetting > 1) then s := s + 'wind     ';
-        s := s + Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit+' '+getWindDirection16(windangle)
-               + ', ' + dsp.OptSep;
+        s := s + Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit;
+        if (dsp.IsWindAngle) 
+            then s := s + ' '+getWindDirection16(windangle);
+        s := s + ', ' + dsp.OptSep;
     end;
     if (dsp.SepSetting > 1) 
         then s := LeftStr(s, Length(s)-3) + '.'

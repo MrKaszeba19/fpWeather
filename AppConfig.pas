@@ -49,13 +49,16 @@ type DisplayOptions = record
 end;
 
 procedure raiserror(Const msg : string);  
+function getUnits(x : Integer) : String;
+function getLocale(x : Integer) : Locale;
+
+procedure setSeparators(var disp : DisplayOptions; option : Integer);
+function DefaultDisplay() : DisplayOptions;
+function adjustDisplay(pom : String) : DisplayOptions;
+
 procedure setConfig(var tok : String; var loc : String; var units : Integer);
 procedure getConfig(var tok : String; var loc : String; var units : Integer);
 function configExists() : Boolean;
-function getUnits(x : Integer) : String;
-function getLocale(x : Integer) : Locale;
-procedure setSeparators(var disp : DisplayOptions; option : Integer);
-function DefaultDisplay() : DisplayOptions;
 
 implementation
 
@@ -199,6 +202,23 @@ begin
     end;
 end;
 
+function NullDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := false;
+    Result.IsDate        := false;
+    Result.IsDescription := false;
+    Result.IsTemperature := false;
+    Result.IsTempMin     := false;
+    Result.IsTempMax     := false;
+    Result.IsPressure    := false;
+    Result.IsHumidity    := false;
+    Result.IsWindSpeed   := false;
+    Result.IsWindAngle   := false;
+    Result.IsVisibility  := false;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
 function DefaultDisplay() : DisplayOptions;
 begin
     Result.IsLocation    := true;
@@ -210,15 +230,65 @@ begin
     Result.IsPressure    := true;
     Result.IsHumidity    := true;
     Result.IsWindSpeed   := true;
-    Result.IsWindAngle   := true;
+    Result.IsWindAngle   := false;
     Result.IsVisibility  := false;
     Result.UseEmojis     := false;
     setSeparators(Result, 1);
 end;
 
+function FullDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := true;
+    Result.IsDate        := true;
+    Result.IsDescription := true;
+    Result.IsTemperature := true;
+    Result.IsTempMin     := true;
+    Result.IsTempMax     := true;
+    Result.IsPressure    := true;
+    Result.IsHumidity    := true;
+    Result.IsWindSpeed   := true;
+    Result.IsWindAngle   := true;
+    Result.IsVisibility  := true;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
+function adjustDisplay(pom : String) : DisplayOptions;
+begin
+    if (pom = 'full') then
+    begin
+        Result := FullDisplay();
+    end else if (pom = 'default') then
+    begin
+        Result := DefaultDisplay();
+    end else begin
+        Result := NullDisplay();
+        if (pos('+', pom) <> 0) then Result := DefaultDisplay();
+        if (pos('a', pom) <> 0) then Result.IsLocation    := True;
+        if (pos('b', pom) <> 0) then Result.IsDate        := True;
+        if (pos('c', pom) <> 0) then Result.IsDescription := True;
+        if (pos('d', pom) <> 0) then Result.IsTemperature := True;
+        if (pos('D', pom) <> 0) then 
+        begin
+            Result.IsTemperature := True;
+            Result.IsTempMin := True;
+            Result.IsTempMax := True;
+        end;
+        if (pos('e', pom) <> 0) then Result.IsPressure := True;
+        if (pos('f', pom) <> 0) then Result.IsHumidity := True;
+        if (pos('g', pom) <> 0) then Result.IsWindSpeed := True;
+        if (pos('G', pom) <> 0) then 
+        begin
+            Result.IsWindSpeed := True;
+            Result.IsWindAngle := True;
+        end;
+        if (pos('h', pom) <> 0) then Result.IsVisibility := True;
+    end;
+end;
 
 
-//
+
+// CONFIG FILES
 
 procedure setUp(tok : String; loc : String; var units : Integer);
 var

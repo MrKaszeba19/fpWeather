@@ -38,12 +38,23 @@ Author: Paul Lipkowski
 **Notes**:
 - Cities with names containing spaces must be quoted, e.g. `-l "Tel Aviv"` or `--location="Bnei Brak"`
 
-### Available locales 
-`N` values for `-u`/`--units` flag:
-- `N = 0` – :united_nations: International SI system (Kelvin, m/s and hPa)
-- `N = 1` – :eu: Metric units (Celsius, km/h and hPa; m/s on JSON output)
-- `N = 2` – :us: US units (Fahrenheit, mph and psi; hPa on JSON output) 
-- `N = 3` – :uk: UK units (Celsius, mph and mb) – so far it works like `N=1` on JSON output
+### Available displayable output data
+Available chars for `S` string used in the `-o`/`--output` flag: (chars may be concatenated)
+- `+` – add default settings (equivalent of `S = abcdefg`)
+- `a` – add location
+- `b` – add date (*to be implemented*)
+- `c` – add weather description
+- `d` – add current temperature
+- `D` – add current temperature and also the lowest and the highest temperature for the day
+- `e` – add atmospheric pressure
+- `f` – add humidity
+- `g` – add wind speed
+- `G` – add wind speed and direction
+- `h` – add visibility distance (*to be implemented*)
+
+**Notes**: 
+- `S = full` is an equivalent of `S = abcDefGh` or `S = +DGh`, i.e. full display
+- `S = default` is an equivalent of `S = abcdefg` or `S = +`, i.e. default display
 
 ### Available line break styles
 `N` values for `-s`/`--style` flag:
@@ -52,13 +63,23 @@ Author: Paul Lipkowski
 - `N = 2` – print every value in a separate line (a list of values)
 - `N = 3` – print every value in a separate line, and all its subvalues as well
 
+### Available locales 
+`N` values for `-u`/`--units` flag:
+- `N = 0` – :united_nations: International SI system (Kelvin, m/s and hPa)
+- `N = 1` – :eu: Metric units (Celsius, km/h and hPa; m/s on JSON output)
+- `N = 2` – :us: US units (Fahrenheit, mph and psi; hPa on JSON output) 
+- `N = 3` – :uk: UK units (Celsius, mph and mb) – so far it works like `N=1` on JSON output
+
 ## Examples
 
 - `fpweather` shows the current weather of your city using your OpenWeatherMap API token in a compact readable format 
 - `fpweather -c` launches config
 - `fpweather -l "Tel Aviv"` shows the current weather in Tel Aviv, IL.
 - `fpweather -u 3` displays weather info of your city using the British locale (Celsius, mph, millibars) 
-- `fpweather -s 3 -u 1 -l Bydgoszcz` displays weather of Bydgoszcz in a bulleted list using Metric units
+- `fpweather -s 3 -u 1 -l Skopje` displays weather of Skopje in a bulleted list using Metric units
+- `fpweather -s 3 -u 1 -o +DG -l Bydgoszcz` displays weather of Bydgoszcz in a bulleted list using Metric units and adds both wind direction and min/max temperature
+- `fpweather --style=3 --units=1 --output=+DG --location=Bydgoszcz` does the same as above
+- `fpweather -s 0 -u 1 -o D -l Gdynia` displays the full temperature info of Gdynia in a flat string using Metric units
 
 ## More info
 
