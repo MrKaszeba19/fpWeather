@@ -8,8 +8,12 @@ uses SysUtils;
 
 {$IFDEF WINDOWS}
 const CATSLASH = '\';
+const LBR = #13#10;
+const CRN = #13;
 {$ELSE}
 const CATSLASH = '/';
+const LBR = #10;
+const CRN = #13;
 {$ENDIF}
 
 
@@ -23,12 +27,35 @@ type Locale = record
     SpeedCoef    : Extended;
 end;
 
+type DisplayOptions = record
+    SepSetting    : Integer;
+    TtlSep        : String;
+    OptSep        : String;
+    OptBullet     : String;
+    SubSep        : String;
+    SubBullet     : String;
+    IsLocation    : Boolean;
+    IsDate        : Boolean;
+    IsDescription : Boolean;
+    IsTemperature : Boolean;
+    IsTempMin     : Boolean;
+    IsTempMax     : Boolean;
+    IsPressure    : Boolean;
+    IsHumidity    : Boolean;
+    IsWindSpeed   : Boolean;
+    IsWindAngle   : Boolean;
+    IsVisibility  : Boolean;
+    UseEmojis     : Boolean;
+end;
+
 procedure raiserror(Const msg : string);  
 procedure setConfig(var tok : String; var loc : String; var units : Integer);
 procedure getConfig(var tok : String; var loc : String; var units : Integer);
 function configExists() : Boolean;
 function getUnits(x : Integer) : String;
 function getLocale(x : Integer) : Locale;
+procedure setSeparators(var disp : DisplayOptions; option : Integer);
+function DefaultDisplay() : DisplayOptions;
 
 implementation
 
@@ -131,6 +158,64 @@ begin
     Result.SpeedUnit    := ' mph';
     Result.SpeedCoef    := 2.23693629;
 end;
+
+// display
+
+procedure setSeparators(var disp : DisplayOptions; option : Integer);
+begin
+    case option of
+        0 : begin
+            disp.SepSetting := option;
+            disp.TtlSep     := '';
+            disp.OptSep     := '';
+            disp.OptBullet  := '';
+            disp.SubSep     := '';
+            disp.SubBullet  := '';
+        end;
+        1 : begin
+            disp.SepSetting := option;
+            disp.TtlSep     := LBR;
+            disp.OptSep     := '';
+            disp.OptBullet  := '';
+            disp.SubSep     := '';
+            disp.SubBullet  := '';
+        end;
+        2 : begin
+            disp.SepSetting := option;
+            disp.TtlSep     := LBR;
+            disp.OptSep     := LBR;
+            disp.OptBullet  := ' - ';
+            disp.SubSep     := '';
+            disp.SubBullet  := '';
+        end;
+        3 : begin
+            disp.SepSetting := option;
+            disp.TtlSep     := LBR;
+            disp.OptSep     := LBR;
+            disp.OptBullet  := ' - ';
+            disp.SubSep     := LBR;
+            disp.SubBullet  := '   * ';
+        end;
+    end;
+end;
+
+function DefaultDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := true;
+    Result.IsDate        := false;
+    Result.IsDescription := true;
+    Result.IsTemperature := true;
+    Result.IsTempMin     := false;
+    Result.IsTempMax     := false;
+    Result.IsPressure    := true;
+    Result.IsHumidity    := true;
+    Result.IsWindSpeed   := true;
+    Result.IsWindAngle   := true;
+    Result.IsVisibility  := false;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
 
 
 //

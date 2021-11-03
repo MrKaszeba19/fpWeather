@@ -23,7 +23,8 @@ type
         Token    : String;
         City     : String;    
         Units    : Integer; 
-        Locale   : Locale;  
+        Locale   : Locale; 
+        Display  : DisplayOptions; 
         ToJSON   : Integer;
         FeedLine : Boolean;
         URL      : String;
@@ -85,6 +86,7 @@ begin
     end;
 
     // change config to suit flags
+    Display := DefaultDisplay();
     if HasOption('u', 'units') then begin
         try
             if StrToInt(getOptionValue('u', 'units')) in [0, 1, 2, 3] then
@@ -113,6 +115,22 @@ begin
             on E: Exception do
             begin
                 writeln('Note: wrong city name. I''m not changing the city then.');
+                writeln(E.toString());
+            end;
+        end;
+    end;
+    if HasOption('s', 'style') then begin
+        try
+            if StrToInt(getOptionValue('s', 'style')) in [0, 1, 2, 3] then
+            begin
+                setSeparators(Display, StrToInt(getOptionValue('s', 'style')));
+            end else begin
+                writeln('Note: wrong style flag value. I''m not changing the styles then.');
+            end;
+        except
+            on E: Exception do
+            begin
+                writeln('Note: wrong style flag value. I''m not changing the styles then.');
                 writeln(E.toString());
             end;
         end;
@@ -152,7 +170,7 @@ begin
             write(printRaw(URL));
             if FeedLine then writeln();
         end else begin
-            write(printInfo(URL, Locale));
+            write(printInfo(URL, Locale, Display));
             if FeedLine then writeln();
         end;
     except
@@ -190,6 +208,10 @@ begin
     writeln('  -l S, --location=S   : Show weather in a specified city');
     writeln('  -n  , --no-feed-line : Do not feed line after program execution');
     writeln('        --raw-json     : Get a raw JSON from OpenWeatherMap (in standard units)');
+    writeln('  -s 0, --style=0      : Flat output');
+    writeln('     1,        =1      : Flat output with location in separate line (default)');
+    writeln('     2,        =2      : Output as a list of values with flat subvalues');
+    writeln('     3,        =3      : Output as a list of values with a list of subvalues');
     writeln('  -T S, --token=S      : Show weather using a specified OpenWeatherMap API token');
     writeln('  -u 0, --units=0      : Use international SI units: Kelvin, m/s, hPa, km');
     writeln('     1,        =1      : Use metric units:           Celsius, km/h, hPa, km');

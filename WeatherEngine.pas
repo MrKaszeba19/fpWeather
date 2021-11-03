@@ -12,7 +12,7 @@ function getRequest(addr : String) : String;
 function printFormattedJSON(str : String) : String;
 function printJSON(str : String) : String;
 function printRaw(str : String) : String;
-function printInfo(str : String; loc : Locale) : String;
+function printInfo(str : String; loc : Locale; dsp : DisplayOptions) : String;
 
 implementation
 
@@ -71,10 +71,11 @@ begin
     Result := getRequest(str);
 end;
 
-function printInfo(str : String; loc : Locale) : String;
+function printInfo(str : String; loc : Locale; dsp : DisplayOptions) : String;
 var
     jData : TJSONData;
     //jObject : TJSONObject;
+    s        : String;
     location : String;
     desc     : String;
     degrees  : Extended;
@@ -85,18 +86,71 @@ var
 begin
     //Result := 'A more beautified look of the weather info is coming soon! ^_^';
     jData := GetJSON(getRequest(str));
-    location := jData.GetPath('name').AsString;
-    desc := jData.GetPath('weather[0]').GetPath('description').AsString;
-    degrees := jData.GetPath('main').GetPath('temp').AsFloat;
-    pressure := jData.GetPath('main').GetPath('pressure').AsInteger;
-    humidity := jData.GetPath('main').GetPath('humidity').AsInteger;
-    windspeed := jData.GetPath('wind').GetPath('speed').AsFloat;
-    windangle := jData.GetPath('wind').GetPath('deg').AsInteger;
-    Result := 'Now in '+location+': '+#13#10+desc+', '
-        +FloatToStr(degrees)+loc.DegreesUnit+', '
-        +Format('%.2f', [(pressure)/loc.PressureCoef])+loc.PressureUnit+', '
-        +IntToStr(humidity)+'% humid, '
-        +Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit+' '+getWindDirection16(windangle)+' wind.';
+    //location := jData.GetPath('name').AsString;
+    //desc := jData.GetPath('weather[0]').GetPath('description').AsString;
+    //degrees := jData.GetPath('main').GetPath('temp').AsFloat;
+    //pressure := jData.GetPath('main').GetPath('pressure').AsInteger;
+    //humidity := jData.GetPath('main').GetPath('humidity').AsInteger;
+    //windspeed := jData.GetPath('wind').GetPath('speed').AsFloat;
+    //windangle := jData.GetPath('wind').GetPath('deg').AsInteger;
+    //Result := 'Now in '+location+': '+#13#10+desc+', '
+    //    +FloatToStr(degrees)+loc.DegreesUnit+', '
+    //    +Format('%.2f', [(pressure)/loc.PressureCoef])+loc.PressureUnit+', '
+    //    +IntToStr(humidity)+'% humid, '
+    //    +Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit+' '+getWindDirection16(windangle)+' wind.';
+    s := '';
+    if (dsp.IsLocation) then 
+    begin
+        location := jData.GetPath('name').AsString;
+        s := s + 'Weather in ' + location + ': ' + dsp.TtlSep;
+    end;
+    if (dsp.IsDescription) then
+    begin
+        desc := jData.GetPath('weather[0]').GetPath('description').AsString;
+        s := s + dsp.OptBullet
+               + desc 
+               + ', ' + dsp.OptSep;
+    end;
+    if (dsp.IsTemperature) then
+    begin
+        degrees := jData.GetPath('main').GetPath('temp').AsFloat;
+        s := s + dsp.OptBullet;
+        if (dsp.SepSetting > 1) then s := s + 'temp     ';
+        s := s + FloatToStr(degrees)+loc.DegreesUnit
+               + ', ' + dsp.OptSep;
+    end;
+    if (dsp.IsPressure) then
+    begin
+        pressure := jData.GetPath('main').GetPath('pressure').AsInteger;
+        s := s + dsp.OptBullet;
+        if (dsp.SepSetting > 1) then s := s + 'pressure ';
+        s := s + Format('%.2f', [(pressure)/loc.PressureCoef])+loc.PressureUnit
+               + ', ' + dsp.OptSep;
+    end;
+    if (dsp.IsHumidity) then
+    begin
+        humidity := jData.GetPath('main').GetPath('humidity').AsInteger;
+        s := s + dsp.OptBullet;
+        if (dsp.SepSetting > 1) then s := s + 'humidity ';
+        s := s + IntToStr(humidity)+'%'
+               + ', ' + dsp.OptSep;
+    end;
+    if (dsp.IsWindSpeed) then
+    begin
+        windspeed := jData.GetPath('wind').GetPath('speed').AsFloat;
+        windangle := jData.GetPath('wind').GetPath('deg').AsInteger;
+        s := s + dsp.OptBullet;
+        if (dsp.SepSetting > 1) then s := s + 'wind     ';
+        s := s + Format('%.2f', [(windspeed)*loc.SpeedCoef])+loc.SpeedUnit+' '+getWindDirection16(windangle)
+               + ', ' + dsp.OptSep;
+    end;
+    if (dsp.SepSetting > 1) 
+        then s := LeftStr(s, Length(s)-3) + '.'
+        else if (dsp.SepSetting = 1) 
+            then s := LeftStr(s, Length(s)-2) + '.'
+            else s := LeftStr(s, Length(s)-2);
+    
+    Result := s;
 end;
 
 end.
