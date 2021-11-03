@@ -48,6 +48,14 @@ type DisplayOptions = record
     UseEmojis     : Boolean;
 end;
 
+type AppSettings = record
+    Token    : String;
+    City     : String;
+    Units    : Integer;
+    Style    : Integer;
+    Output   : String;
+end;
+
 procedure raiserror(Const msg : string);  
 function getUnits(x : Integer) : String;
 function getLocale(x : Integer) : Locale;
@@ -56,8 +64,8 @@ procedure setSeparators(var disp : DisplayOptions; option : Integer);
 function DefaultDisplay() : DisplayOptions;
 function adjustDisplay(pom : String) : DisplayOptions;
 
-procedure setConfig(var tok : String; var loc : String; var units : Integer);
-procedure getConfig(var tok : String; var loc : String; var units : Integer);
+procedure setConfig(var x : AppSettings);
+procedure getConfig(var x : AppSettings);
 function configExists() : Boolean;
 
 implementation
@@ -290,7 +298,7 @@ end;
 
 // CONFIG FILES
 
-procedure setUp(tok : String; loc : String; var units : Integer);
+procedure setUp(x : AppSettings);
 var
     dir   : String;
     isdir : Boolean;
@@ -316,9 +324,11 @@ begin
         ok := CopyFile(dir+'cfg', dir+'cfg.bak');
         assignfile(fl, dir+'cfg');
         rewrite(fl);
-        writeln(fl, tok);
-        writeln(fl, loc);
-        writeln(fl, units);
+        writeln(fl, x.Token);
+        writeln(fl, x.City);
+        writeln(fl, x.Units);
+        writeln(fl, x.Style);
+        writeln(fl, x.Output);
         closefile(fl);
     end;
 end;
@@ -345,35 +355,54 @@ begin
     end;
 end;
 
-procedure setConfig(var tok : String; var loc : String; var units : Integer);
-var
-    guess : Integer;
-begin
-    writeln('fpWeather Config');
-    write('Type your OpenWeatherApp API token: ');
-    readln(tok);
-    write('Type your city (in English):        ');
-    readln(loc);
-    repeat
-        writeln('Preferable locale:                 ');
-        writeln('    0 - SI (Kelvin, m/s, YMD)');
-        //writeln('    1 - Metric (Celsius, km/h)');
-        writeln('    1 - Metric (Celsius, m/s, DMY)');
-        writeln('    2 - US Imperial (Fahrenheit, mph, MDY)');
-        writeln('    3 - UK Imperial (Celsius, mph, DMY)');
-        write('Your choice: ');
-        readln(guess);
-    until guess in [0, 1, 2, 3];
-    Units := guess;
-    setUp(tok, loc, units);
-end;
 
 function configExists() : Boolean;
 begin
     Result := FileExists(GetAppConfigDir(false)+CATSLASH+'cfg');
 end;
 
-procedure getConfig(var tok : String; var loc : String; var units : Integer);
+procedure setConfig(var x : AppSettings);
+var
+    guess : Integer;
+begin
+    writeln('fpWeather Config');
+    write('Type your OpenWeatherApp API token: ');
+    readln(x.Token);
+    write('Type your city (in English):        ');
+    readln(x.City);
+    repeat
+        writeln('Choose your locale: ');
+        writeln('    0 - SI          (Kelvin, m/s, YMD)');
+        writeln('    1 - Metric      (Celsius, km/h, DMY)');
+        writeln('    2 - US Imperial (Fahrenheit, mph, MDY)');
+        writeln('    3 - UK Imperial (Celsius, mph, DMY)');
+        write('Your choice: ');
+        readln(guess);
+    until guess in [0, 1, 2, 3];
+    x.Units := guess;
+    repeat
+        writeln('Choose your style: ');
+        writeln('    0 - Print flat string');
+        writeln('    1 - Print location in a separate line');
+        writeln('        and the weather info in a flat string');
+        writeln('    2 - Print weather info in a compact list');
+        writeln('    3 - Print weather info in a full list');
+        write('Your choice: ');
+        readln(guess);
+    until guess in [0, 1, 2, 3];
+    x.Style := guess;
+    writeln('Specify your output: ');
+    writeln('    default - Print compact weather info');
+    writeln('       full - Print full weather info');
+    writeln('You can type something else that is compatible with a --style flag.');
+    writeln('See more at https://github.com/RooiGevaar19/fpWeather');
+    write('Your choice (press ENTER for default options): ');
+    readln(x.Output);
+    if (x.Output = '') then x.Output := 'default';
+    setUp(x);
+end;
+
+procedure getConfig(var x : AppSettings);
 var
     dir : String;
     fl  : Text;
@@ -384,9 +413,11 @@ begin
         try
             assignfile(fl, dir+'cfg');
             reset(fl);
-            readln(fl, tok);
-            readln(fl, loc);
-            readln(fl, units);
+            readln(fl, x.Token);
+            readln(fl, x.City);
+            readln(fl, x.Units);
+            readln(fl, x.Style);
+            readln(fl, x.Output);
             closefile(fl);  
         except
             on E: Exception do
@@ -398,5 +429,6 @@ begin
         raiserror('Error: Config file not found.');
     end;
 end;
+
 
 end.

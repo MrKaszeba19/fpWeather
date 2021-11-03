@@ -20,10 +20,8 @@ uses SysUtils, Classes,
 type
     MyApp = class(TCustomApplication)
     private
-        Token    : String;
-        City     : String;    
-        Units    : Integer; 
         Locale   : Locale; 
+        Settings : AppSettings;
         Display  : DisplayOptions; 
         ToJSON   : Integer;
         FeedLine : Boolean;
@@ -46,7 +44,7 @@ begin
     end;
 
     if HasOption('c', 'config') then begin
-        SetConfig(Token, City, Units);
+        SetConfig(Settings);
         Halt();
     end;
 
@@ -56,7 +54,7 @@ begin
     begin
         try
             writeln('Note: No config file found. I''m creating new one.');
-            SetConfig(Token, City, Units); 
+            SetConfig(Settings);
         except
             on E: Exception do
             begin
@@ -76,7 +74,7 @@ begin
                 else ToJSON := 0;
     FeedLine := not HasOption('n', 'no-feed-line');
     try
-        GetConfig(Token, City, Units);
+        GetConfig(Settings);
     except
         on E: Exception do
         begin
@@ -90,7 +88,7 @@ begin
         try
             if StrToInt(getOptionValue('u', 'units')) in [0, 1, 2, 3] then
             begin
-                Units := StrToInt(getOptionValue('u', 'units'));
+                Settings.Units := StrToInt(getOptionValue('u', 'units'));
             end else begin
                 writeln('Note: wrong unit flag value. I''m not changing the units then.');
             end;
@@ -106,7 +104,7 @@ begin
         try
             if getOptionValue('l', 'location') <> '' then
             begin
-                City := getOptionValue('l', 'location');
+                Settings.City := getOptionValue('l', 'location');
             end else begin
                 writeln('Note: empty city name. I''m not changing the city then.');
             end;
@@ -120,7 +118,6 @@ begin
     end;
     if HasOption('o', 'output') then begin
         try
-            //pom := getOptionValue('o', 'output');
             Display := adjustDisplay(getOptionValue('o', 'output'));
         except
             on E: Exception do
@@ -130,7 +127,7 @@ begin
             end;
         end;
     end else begin
-        Display := DefaultDisplay();
+        Display := adjustDisplay(Settings.Output);
     end;
     if HasOption('s', 'style') then begin
         try
@@ -147,12 +144,22 @@ begin
                 writeln(E.toString());
             end;
         end;
+    end else begin
+        try
+            setSeparators(Display, Settings.Style);
+        except
+            on E: Exception do
+            begin
+                writeln('Note: wrong style flag value. I''m not changing the styles then.');
+                writeln(E.toString());
+            end;
+        end;
     end;
     if HasOption('T', 'token') then begin
         try
             if getOptionValue('T', 'token') <> '' then
             begin
-                Token := getOptionValue('T', 'token');
+                Settings.Token := getOptionValue('T', 'token');
             end else begin
                 writeln('Note: empty token name. Using your token from the config file.');
             end;
@@ -166,10 +173,10 @@ begin
     end;
 
     // print weather info
-    Locale := GetLocale(Units);
+    Locale := GetLocale(Settings.Units);
     if (toJSON = 1) then Locale.Param := 'standard';
     try
-        URL := 'http://api.openweathermap.org/data/2.5/weather?q='+City+'&appid='+Token+'&units='+Locale.Param+'';
+        URL := 'http://api.openweathermap.org/data/2.5/weather?q='+Settings.City+'&appid='+Settings.Token+'&units='+Locale.Param+'';
         if (toJSON >= 3) then
         begin
             write(printFormattedJSON(URL));
