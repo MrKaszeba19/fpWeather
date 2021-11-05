@@ -52,7 +52,7 @@ Available chars for `S` string used in the `-o`/`--output` flag: (chars may be c
 - `f` – add humidity
 - `g` – add wind speed
 - `G` – add wind speed and direction
-- `h` – add visibility distance (*to be implemented*)
+- `h` – add visibility distance
 
 #### Preset output setups
 You can use one of the following options for preset output setups:
