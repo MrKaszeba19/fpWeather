@@ -28,7 +28,7 @@ Author: Paul Lipkowski
     * `-J` or `--JSON` – Print a beautified JSON (*to be improved*)
     * `-l` or `--location` – Overwrite the city for the particular program execution
     * `-n` or `--no-feed-line` – Don't feed the line after the execution of the program 
-    * `-o S` or `--output=S` – Adjust the output data you want to be displayed (*to be implemented*)
+    * `-o S` or `--output=S` – Adjust the output data you want to be displayed
     * `--raw-json` – Print a raw JSON from OpenWeatherMap (it returns the result in international SI units only)
     * `-s N` or `--style=N` – Determine the style of the output
     * `-t N` or `--time=N` – Display weather data for the `N`th day after today (*to be implemented*, `N` may be negative, so then it would display weather from `N` days ago)
@@ -39,6 +39,8 @@ Author: Paul Lipkowski
 - Cities with names containing spaces must be quoted, e.g. `-l "Tel Aviv"` or `--location="Bnei Brak"`
 
 ### Available displayable output data
+
+#### Customized setups for output
 Available chars for `S` string used in the `-o`/`--output` flag: (chars may be concatenated)
 - `+` – add default settings (equivalent of `S = abcdefg`)
 - `a` – add location
@@ -52,16 +54,21 @@ Available chars for `S` string used in the `-o`/`--output` flag: (chars may be c
 - `G` – add wind speed and direction
 - `h` – add visibility distance (*to be implemented*)
 
-**Notes**: 
-- `S = full` is an equivalent of `S = abcDefGh` or `S = +DGh`, i.e. full display
+#### Preset output setups
+You can use one of the following options for preset output setups:
 - `S = default` is an equivalent of `S = abcdefg` or `S = +`, i.e. default display
+- `S = basic` is an equivalent of `S = acdef`
+- `S = medium` is an equivalent of `S = abcdefgh` or `S = +h`
+- `S = high` is an equivalent of `S = abcdefGh` or `S = +Gh`
+- `S = full` is an equivalent of `S = abcDefGh` or `S = +DGh`, i.e. full display
 
 ### Available line break styles
 `N` values for `-s`/`--style` flag:
 - `N = 0` – print flat string
 - `N = 1` – print flat output, except for location being in a separate line (**default**)
-- `N = 2` – print every value in a separate line (a list of values)
-- `N = 3` – print every value in a separate line, and all its subvalues as well
+- `N = 2` – same as `N = 1`, but with labels
+- `N = 3` – print every value in a separate line (a list of values)
+- `N = 4` – print every value in a separate line, and all its subvalues as well
 
 ### Available locales 
 `N` values for `-u`/`--units` flag:
@@ -76,10 +83,12 @@ Available chars for `S` string used in the `-o`/`--output` flag: (chars may be c
 - `fpweather -c` launches config
 - `fpweather -l "Tel Aviv"` shows the current weather in Tel Aviv, IL.
 - `fpweather -u 3` displays weather info of your city using the British locale (Celsius, mph, millibars) 
-- `fpweather -s 3 -u 1 -l Skopje` displays weather of Skopje in a bulleted list using Metric units
-- `fpweather -s 3 -u 1 -o +DG -l Bydgoszcz` displays weather of Bydgoszcz in a bulleted list using Metric units and adds both wind direction and min/max temperature
+- `fpweather -s 4 -u 1 -l Skopje` displays weather of Skopje in a bulleted list using Metric units
+- `fpweather -s 4 -u 1 -o +DG -l Bydgoszcz` displays weather of Bydgoszcz in a bulleted list using Metric units and adds both wind direction and min/max temperature
 - `fpweather --style=3 --units=1 --output=+DG --location=Bydgoszcz` does the same as above
 - `fpweather -s 0 -u 1 -o D -l Gdynia` displays the full temperature info of Gdynia in a flat string using Metric units
+- `fpweather -s 4 -u 1 -o +DGh -l Gdynia` displays the full info of Gdynia in a flat string using Metric units
+- `fpweather -s 4 -u 1 -o full -l Gdynia` does the same as above
 
 ## More info
 

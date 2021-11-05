@@ -18,13 +18,17 @@ const CRN = #13;
 
 
 type Locale = record
-    Name         : String;
-    Param        : String;
-    DegreesUnit  : String;
-    PressureUnit : String;
-    PressureCoef : Extended; 
-    SpeedUnit    : String;
-    SpeedCoef    : Extended;
+    Name          : String;
+    Param         : String;
+    DegreesUnit   : String;
+    PressureUnit  : String;
+    PressureCoef  : Extended; 
+    SpeedUnit     : String;
+    SpeedCoef     : Extended;
+    DistanceUnit  : String;
+    DistanceUnit2 : String;
+    DistanceCoef  : Extended;
+    DistanceRatio : Extended;
 end;
 
 type DisplayOptions = record
@@ -128,46 +132,62 @@ end;
 
 function LocaleSI() : Locale;
 begin
-    Result.Name         := 'SI International';
-    Result.Param        := 'standard';
-    Result.DegreesUnit  := ' K';
-    Result.PressureUnit := ' hPa';
-    Result.PressureCoef := 1.0; 
-    Result.SpeedUnit    := ' m/s';
-    Result.SpeedCoef    := 1.0;
+    Result.Name          := 'SI International';
+    Result.Param         := 'standard';
+    Result.DegreesUnit   := ' K';
+    Result.PressureUnit  := ' hPa';
+    Result.PressureCoef  := 1.0; 
+    Result.SpeedUnit     := ' m/s';
+    Result.SpeedCoef     := 1.0;
+    Result.DistanceUnit  := ' m';
+    Result.DistanceUnit2 := ' km';
+    Result.DistanceCoef  := 1.0;
+    Result.DistanceRatio := 1000.0;
 end;
 
 function LocaleEU() : Locale;
 begin
-    Result.Name         := 'EU Metric';
-    Result.Param        := 'metric';
-    Result.DegreesUnit  := '°C';
-    Result.PressureUnit := ' hPa';
-    Result.PressureCoef := 1.0; 
-    Result.SpeedUnit    := ' km/h';
-    Result.SpeedCoef    := 3.6;
+    Result.Name          := 'EU Metric';
+    Result.Param         := 'metric';
+    Result.DegreesUnit   := '°C';
+    Result.PressureUnit  := ' hPa';
+    Result.PressureCoef  := 1.0; 
+    Result.SpeedUnit     := ' km/h';
+    Result.SpeedCoef     := 3.6;
+    Result.DistanceUnit  := ' m';
+    Result.DistanceUnit2 := ' km';
+    Result.DistanceCoef  := 1.0;
+    Result.DistanceRatio := 1000.0;
 end;
 
 function LocaleUS() : Locale;
 begin
-    Result.Name         := 'US Imperial';
-    Result.Param        := 'imperial';
-    Result.DegreesUnit  := '°F';
-    Result.PressureUnit := ' psi';
-    Result.PressureCoef := 68.9475728; 
-    Result.SpeedUnit    := ' mph';
-    Result.SpeedCoef    := 1.0;
+    Result.Name          := 'US Imperial';
+    Result.Param         := 'imperial';
+    Result.DegreesUnit   := '°F';
+    Result.PressureUnit  := ' psi';
+    Result.PressureCoef  := 68.9475728; 
+    Result.SpeedUnit     := ' mph';
+    Result.SpeedCoef     := 1.0;
+    Result.DistanceUnit  := ' ft';
+    Result.DistanceUnit2 := ' mi';
+    Result.DistanceCoef  := 3.2808399;
+    Result.DistanceRatio := 5280.0;
 end;
 
 function LocaleUK() : Locale;
 begin
-    Result.Name         := 'UK Imperial';
-    Result.Param        := 'metric';
-    Result.DegreesUnit  := '°C';
-    Result.PressureUnit := ' mb';
-    Result.PressureCoef := 1.0; 
-    Result.SpeedUnit    := ' mph';
-    Result.SpeedCoef    := 2.23693629;
+    Result.Name          := 'UK Imperial';
+    Result.Param         := 'metric';
+    Result.DegreesUnit   := '°C';
+    Result.PressureUnit  := ' mb';
+    Result.PressureCoef  := 1.0; 
+    Result.SpeedUnit     := ' mph';
+    Result.SpeedCoef     := 2.23693629;
+    Result.DistanceUnit  := ' yd';
+    Result.DistanceUnit2 := ' mi';
+    Result.DistanceCoef  := 1.0936133;
+    Result.DistanceRatio := 1760.0;
 end;
 
 // display
@@ -194,12 +214,20 @@ begin
         2 : begin
             disp.SepSetting := option;
             disp.TtlSep     := LBR;
+            disp.OptSep     := '';
+            disp.OptBullet  := '';
+            disp.SubSep     := '';
+            disp.SubBullet  := '';
+        end;
+        3 : begin
+            disp.SepSetting := option;
+            disp.TtlSep     := LBR;
             disp.OptSep     := LBR;
             disp.OptBullet  := ' - ';
             disp.SubSep     := '';
             disp.SubBullet  := '';
         end;
-        3 : begin
+        4 : begin
             disp.SepSetting := option;
             disp.TtlSep     := LBR;
             disp.OptSep     := LBR;
@@ -227,10 +255,61 @@ begin
     setSeparators(Result, 1);
 end;
 
-function DefaultDisplay() : DisplayOptions;
+function BasicDisplay() : DisplayOptions;
 begin
     Result.IsLocation    := true;
     Result.IsDate        := false;
+    Result.IsDescription := true;
+    Result.IsTemperature := true;
+    Result.IsTempMin     := false;
+    Result.IsTempMax     := false;
+    Result.IsPressure    := true;
+    Result.IsHumidity    := true;
+    Result.IsWindSpeed   := false;
+    Result.IsWindAngle   := false;
+    Result.IsVisibility  := false;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
+function MediumDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := true;
+    Result.IsDate        := true;
+    Result.IsDescription := true;
+    Result.IsTemperature := true;
+    Result.IsTempMin     := false;
+    Result.IsTempMax     := false;
+    Result.IsPressure    := true;
+    Result.IsHumidity    := true;
+    Result.IsWindSpeed   := true;
+    Result.IsWindAngle   := false;
+    Result.IsVisibility  := true;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
+function HighDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := true;
+    Result.IsDate        := true;
+    Result.IsDescription := true;
+    Result.IsTemperature := true;
+    Result.IsTempMin     := false;
+    Result.IsTempMax     := false;
+    Result.IsPressure    := true;
+    Result.IsHumidity    := true;
+    Result.IsWindSpeed   := true;
+    Result.IsWindAngle   := true;
+    Result.IsVisibility  := true;
+    Result.UseEmojis     := false;
+    setSeparators(Result, 1);
+end;
+
+function DefaultDisplay() : DisplayOptions;
+begin
+    Result.IsLocation    := true;
+    Result.IsDate        := true;
     Result.IsDescription := true;
     Result.IsTemperature := true;
     Result.IsTempMin     := false;
@@ -269,6 +348,15 @@ begin
     end else if (pom = 'default') then
     begin
         Result := DefaultDisplay();
+    end else if (pom = 'basic') then
+    begin
+        Result := BasicDisplay();
+    end else if (pom = 'medium') then
+    begin
+        Result := MediumDisplay();
+    end else if (pom = 'high') then
+    begin
+        Result := HighDisplay();
     end else begin
         Result := NullDisplay();
         if (pos('+', pom) <> 0) then Result := DefaultDisplay();
@@ -385,14 +473,20 @@ begin
         writeln('    0 - Print flat string');
         writeln('    1 - Print location in a separate line');
         writeln('        and the weather info in a flat string');
-        writeln('    2 - Print weather info in a compact list');
-        writeln('    3 - Print weather info in a full list');
+        writeln('    2 - Same as 1, but with labels');
+        writeln('    3 - Print weather info in a compact list');
+        writeln('    4 - Print weather info in a full list');
         write('Your choice: ');
         readln(guess);
-    until guess in [0, 1, 2, 3];
+    until guess in [0, 1, 2, 3, 4];
     x.Style := guess;
     writeln('Specify your output: ');
     writeln('    default - Print compact weather info');
+    writeln('              (=medium, but without visibility)');
+    writeln('      basic - Print basic weather info');
+    writeln('              (temp, pressure, humidity, wind)');
+    writeln('     medium - Print all available info without tiny details');
+    writeln('       high - Same as medium, but include wind direction as well');
     writeln('       full - Print full weather info');
     writeln('You can type something else that is compatible with a --style flag.');
     writeln('See more at https://github.com/RooiGevaar19/fpWeather');

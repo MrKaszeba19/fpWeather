@@ -232,8 +232,9 @@ begin
     writeln('                         (If S="full", then display all data)');
     writeln('  -s 0, --style=0      : Flat output');
     writeln('     1,        =1      : Flat output with location in separate line (default)');
-    writeln('     2,        =2      : Output as a list of values with flat subvalues');
-    writeln('     3,        =3      : Output as a list of values with a list of subvalues');
+    writeln('     2,        =2      : Flat output with location in separate line + labels');
+    writeln('     3,        =3      : Output as a list of values with flat subvalues');
+    writeln('     4,        =4      : Output as a list of values with a list of subvalues');
     writeln('  -T S, --token=S      : Show weather using a specified OpenWeatherMap API token');
     writeln('  -u 0, --units=0      : Use international SI units: Kelvin, m/s, hPa, km');
     writeln('     1,        =1      : Use metric units:           Celsius, km/h, hPa, km');
