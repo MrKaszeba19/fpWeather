@@ -29,6 +29,7 @@ type Locale = record
     DistanceUnit2 : String;
     DistanceCoef  : Extended;
     DistanceRatio : Extended;
+    DateFormat    : String;
 end;
 
 type DisplayOptions = record
@@ -143,6 +144,7 @@ begin
     Result.DistanceUnit2 := ' km';
     Result.DistanceCoef  := 1.0;
     Result.DistanceRatio := 1000.0;
+    Result.DateFormat    := 'yyyy-mm-dd';
 end;
 
 function LocaleEU() : Locale;
@@ -158,6 +160,7 @@ begin
     Result.DistanceUnit2 := ' km';
     Result.DistanceCoef  := 1.0;
     Result.DistanceRatio := 1000.0;
+    Result.DateFormat    := 'dd.mm.yyyy';
 end;
 
 function LocaleUS() : Locale;
@@ -173,6 +176,7 @@ begin
     Result.DistanceUnit2 := ' mi';
     Result.DistanceCoef  := 3.2808399;
     Result.DistanceRatio := 5280.0;
+    Result.DateFormat    := 'mm/dd/yyyy';
 end;
 
 function LocaleUK() : Locale;
@@ -184,10 +188,11 @@ begin
     Result.PressureCoef  := 1.0; 
     Result.SpeedUnit     := ' mph';
     Result.SpeedCoef     := 2.23693629;
-    Result.DistanceUnit  := ' yd';
+    Result.DistanceUnit  := ' yds';
     Result.DistanceUnit2 := ' mi';
     Result.DistanceCoef  := 1.0936133;
     Result.DistanceRatio := 1760.0;
+    Result.DateFormat    := 'dd.mm.yyyy';
 end;
 
 // display

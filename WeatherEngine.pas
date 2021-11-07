@@ -16,7 +16,27 @@ function printInfo(str : String; loc : Locale; dsp : DisplayOptions) : String;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, DateParser;
+
+// haze 🌫️
+// rain 🌧️
+// moderate rain 🌧️
+// light snow 🌩️
+// drizzle ❄️❄️ 
+// snow ❄️
+// light snow 🌨️
+// scattered clouds ⛅
+// broken clouds ⛅
+// overcast clouds ☁️
+// light rain 🌧️
+// rain ⛆
+// hail ⛆
+// storm 🌩️
+// clear sky ☀️
+// hot 🌡️
+// cold 🥶
+// ice 🧊
+
 
 function isInInterval(x : Integer; a1, a2 : Extended) : Boolean;
 begin
@@ -77,6 +97,7 @@ var
     //jObject : TJSONObject;
     s        : String;
     location : String;
+    date     : Integer;
     desc     : String;
     degrees  : Extended;
     pressure : Integer;
@@ -103,7 +124,18 @@ begin
     if (dsp.IsLocation) then 
     begin
         location := jData.GetPath('name').AsString;
-        s := s + 'Weather in ' + location + ': ' + dsp.TtlSep;
+        s := s + 'Weather in ' + location;
+        if (dsp.isDate) then 
+        begin
+            date := jData.GetPath('dt').AsInteger;
+            //s := s + ' on ' + getDateFromTimestamp(date);
+            s := s + ' on ' + getDateFromTimestamp(date, loc.DateFormat);
+        end;
+        s := s + ': ' + dsp.TtlSep;
+    end else if (dsp.IsDate) then
+    begin
+        date := jData.GetPath('dt').AsInteger;
+        s := getDateFromTimestamp(date, loc.DateFormat) + ': ' + dsp.TtlSep;
     end;
     if (dsp.IsDescription) then
     begin
