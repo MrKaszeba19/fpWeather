@@ -44,7 +44,7 @@ Author: Paul Lipkowski
 Available chars for `S` string used in the `-o`/`--output` flag: (chars may be concatenated)
 - `+` – add default settings (equivalent of `S = abcdefg`)
 - `a` – add location
-- `b` – add date (*to be implemented*)
+- `b` – add date
 - `c` – add weather description
 - `d` – add current temperature
 - `D` – add current temperature and also the lowest and the highest temperature for the day
@@ -89,6 +89,14 @@ You can use one of the following options for preset output setups:
 - `fpweather -s 0 -u 1 -o D -l Gdynia` displays the full temperature info of Gdynia in a flat string using Metric units
 - `fpweather -s 4 -u 1 -o +DGh -l Gdynia` displays the full info of Gdynia in a flat string using Metric units
 - `fpweather -s 4 -u 1 -o full -l Gdynia` does the same as above
+
+## Future plans
+
+Note that the plans may change or be cancelled at all.
+- Checking the weather forecast for the next few days
+- Weather history
+- Improved JSON output
+- Integration with other console apps (maybe)
 
 ## More info
 
