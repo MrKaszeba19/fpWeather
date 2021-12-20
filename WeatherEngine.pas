@@ -14,6 +14,8 @@ function printJSON(str : String) : String;
 function printRaw(str : String) : String;
 function printInfo(str : String; loc : Locale; dsp : DisplayOptions) : String;
 
+function checkInternet() : Boolean;
+
 implementation
 
 uses SysUtils, DateParser, VisualHelper;
@@ -169,6 +171,19 @@ begin
             else s := LeftStr(s, Length(s)-2);
     
     Result := s;
+end;
+
+function checkInternet() : Boolean;
+begin
+    Result := False;
+    try
+        if (getRequest('http://www.google.com') <> '') then Result := True;
+    except
+        on E: Exception do
+        begin
+            Result := False;
+        end;
+    end;
 end;
 
 end.

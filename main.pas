@@ -175,30 +175,36 @@ begin
     // print weather info
     Locale := GetLocale(Settings.Units);
     if (toJSON = 1) then Locale.Param := 'standard';
-    try
-        URL := 'http://api.openweathermap.org/data/2.5/weather?q='+Settings.City+'&appid='+Settings.Token+'&units='+Locale.Param+'';
-        if (toJSON >= 3) then
-        begin
-            write(printFormattedJSON(URL));
-            if FeedLine then writeln();
-        end else if (toJSON = 2) then 
-        begin 
-            write(printJSON(URL));
-            if FeedLine then writeln();
-        end else if (toJSON = 1) then 
-        begin 
-            write(printRaw(URL));
-            if FeedLine then writeln();
-        end else begin
-            write(printInfo(URL, Locale, Display));
-            if FeedLine then writeln();
+    if checkInternet() then
+    begin
+        try
+            URL := 'http://api.openweathermap.org/data/2.5/weather?q='+Settings.City+'&appid='+Settings.Token+'&units='+Locale.Param+'';
+            if (toJSON >= 3) then
+            begin
+                write(printFormattedJSON(URL));
+                if FeedLine then writeln();
+            end else if (toJSON = 2) then 
+            begin 
+                write(printJSON(URL));
+                if FeedLine then writeln();
+            end else if (toJSON = 1) then 
+            begin 
+                write(printRaw(URL));
+                if FeedLine then writeln();
+            end else begin
+                write(printInfo(URL, Locale, Display));
+                if FeedLine then writeln();
+            end;
+        except
+            on E: Exception do
+            begin
+                writeln(E.toString());
+            end;
         end;
-    except
-        on E: Exception do
-        begin
-            writeln(E.toString());
-        end;
+    end else begin
+        writeln('Cannot get weather data - no Internet connection!');
     end;
+    
 
     // terminate
     Terminate; 
